@@ -1,12 +1,12 @@
-import pytest
+from itertools import repeat
+from typing import List
+
 import numpy as np
 import pandas as pd
+import pytest
+from gym.spaces import Box, Space
+
 import tensortrade.exchanges as exchanges
-
-from typing import List
-from itertools import repeat
-from gym.spaces import Space, Box
-
 from tensortrade import TradingContext
 from tensortrade.features import FeaturePipeline, FeatureTransformer
 from tensortrade.features.stationarity import FractionalDifference
@@ -14,7 +14,7 @@ from tensortrade.features.stationarity import FractionalDifference
 
 @pytest.fixture
 def exchange():
-    return exchanges.get('fbm')
+    return exchanges.get('simulated')
 
 
 @pytest.fixture

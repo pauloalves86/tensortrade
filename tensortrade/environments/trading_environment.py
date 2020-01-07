@@ -420,9 +420,14 @@ class TradingEnvironment(gym.Env, TimeIndexed):
             if self.viewer is not None:
                 df = self.exchange._pre_transformed_data
                 start = max(0, self.clock.step - self._window_size)
-                df = df[start:self.clock.step]
+                df = df[start:self.clock.step].reset_index(drop=True)
+                trades = [
+                    (trade[0].step - start, trade[0].price, trade[0].side.value)
+                    for trade in self._broker.trades.values()
+                    if trade[0].step >= start
+                ]
                 self.viewer.render(df, self._portfolio.performance['net_worth'],
-                                   self._broker.trades)
+                                   trades)
 
     def close(self):
         """Utility method to clean environment before closing."""

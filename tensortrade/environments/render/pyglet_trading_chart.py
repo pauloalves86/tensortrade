@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 import pyglet
 from gym.envs.classic_control import rendering
 
@@ -43,14 +45,14 @@ class PygletTradingChart:
         self.markers = []
         self._draw_axis()
 
-    def render(self, dataframe: 'DataFrame', net_worths: 'List[float]',
-               trades: 'List[Tuple[int, float, float]]'):
+    def render(self, dataframe: 'DataFrame', net_worths: List[float],
+               trades: List[Tuple[int, float, float]] = None):
         window_size = len(dataframe)
         if window_size <= 1:
             return
         self._render_chart(dataframe, trades, window_size)
         self._render_net_worths(net_worths.values, window_size)
-        return self.viewer.render()
+        self.viewer.render()
 
     def _render_net_worths(self, net_worths, window_size):
         initial = round(net_worths[0], 2)
@@ -63,8 +65,8 @@ class PygletTradingChart:
                           self.width / 2, self.height - 10)
         self.viewer.add_onetime(label)
         if len(net_worths) > 1:
-            max_ = max(net_worths)
-            min_ = min(net_worths)
+            max_ = max(net_worths) * 1.1
+            min_ = min(net_worths) * .9
             values = (net_worths - min_) / (max_ - min_)
             values *= self.net_worths_chart_height
             start = max(1, len(net_worths) - window_size)
@@ -142,7 +144,7 @@ class PygletTradingChart:
         self.viewer.add_onetime(line)
         self.viewer.add_onetime(open_close)
 
-        if trade:
+        if trade is not None and len(trade) > 0:
             value = trade[1]
             if trade[0] == 'buy':
                 sign = rendering.FilledPolygon([
