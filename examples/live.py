@@ -17,8 +17,8 @@ def main():
     env = TradingEnvironment(portfolio, exchange, action, 'simple')
     while True:
         env.step(0)
-        env.render('chart')
-        time.sleep(1)
+        env.render('human')
+        time.sleep(.02)
 
 
 if __name__ == "__main__":

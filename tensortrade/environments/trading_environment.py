@@ -414,20 +414,16 @@ class TradingEnvironment(gym.Env, TimeIndexed):
                                    self.render_benchmarks,
                                    self._broker.trades)
         elif mode == 'human':
-            if self.viewer is None and hasattr(self.exchange, '_pre_transformed_data'):
-                self.viewer = PygletTradingChart()
+            if self.viewer is None and hasattr(self.exchange, 'data_frame'):
+                self.viewer = PygletTradingChart(self._window_size)
 
             if self.viewer is not None:
-                df = self.exchange._pre_transformed_data
-                start = max(0, self.clock.step - self._window_size)
-                df = df[start:self.clock.step].reset_index(drop=True)
-                trades = [
-                    (trade[0].step - start, trade[0].price, trade[0].side.value)
-                    for trade in self._broker.trades.values()
-                    if trade[0].step >= start
-                ]
-                self.viewer.render(df, self._portfolio.performance['net_worth'],
-                                   trades)
+                if self.clock.step < len(self.exchange.data_frame):
+                    last = self.exchange.data_frame.iloc[self.clock.step]
+                else:
+                    last = self.exchange.data_frame.iloc[-1]
+                ohlc = last[[0, 1, 2, 3]].to_list()
+                self.viewer.render(ohlc, last[4], [])
 
     def close(self):
         """Utility method to clean environment before closing."""
